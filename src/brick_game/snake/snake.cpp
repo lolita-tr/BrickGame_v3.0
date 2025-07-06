@@ -16,7 +16,7 @@ Snake::Snake() {
   std::srand(std::time(nullptr));
 
   game_info_.field = new int *[FIELD_H];
-  for (int i = 0; i < FIELD_H; ++i) {
+  for (int i = 0; i < FIELD_H; i++) {
     game_info_.field[i] = new int[FIELD_H]();
   }
 
@@ -58,11 +58,12 @@ Snake::~Snake() {
  * snake's body.
  */
 void Snake::GenerateApple() {
+  
   SnakeElements position;
 
   do {
-    position.x = 1 + rand() % (FIELD_W);
-    position.y = 1 + rand() % (FIELD_H);
+    position.x = rand() % FIELD_W;
+    position.y = rand() % FIELD_H;
   } while (CheckSnakeBody(position.x, position.y));
 
   game_info_.apple[0][0] = position.x;
@@ -308,12 +309,13 @@ bool Snake::CheckAteItself() {
  * otherwise.
  */
 bool Snake::CheckSnakeBody(int x, int y) {
-  for (const auto &segment : snake_coordinates_) {
-    if (segment.x == x && segment.y == y) {
-      return true;
-    }
+  // Проверяем границы поля
+  if (x < 0 || x >= FIELD_W || y < 0 || y >= FIELD_H) {
+    return true; // За пределами поля считаем занятым
   }
-  return false;
+  
+  // Проверяем поле напрямую - если там есть змейка (1 или 2) или яблоко (3)
+  return (game_info_.field[x][y] == 1 || game_info_.field[x][y] == 2 || game_info_.field[x][y] == 3);
 }
 
 /**
@@ -330,14 +332,14 @@ bool Snake::CheckSnakeBody(int x, int y) {
  */
 void Snake::CheckEndGame() {
   for (size_t i = 0; i < snake_coordinates_.size(); ++i) {
-    if (snake_coordinates_.front().x <= 1 && GetDirection() == Left) {
+    if (snake_coordinates_.front().x <= 0 && GetDirection() == Left) {
       game_info_.pause = LOSED;
-    } else if (snake_coordinates_.front().x >= FIELD_W &&
+    } else if (snake_coordinates_.front().x >= FIELD_W - 1 &&
                GetDirection() == Right) {
       game_info_.pause = LOSED;
-    } else if (snake_coordinates_.front().y <= 1 && GetDirection() == Up) {
+    } else if (snake_coordinates_.front().y <= 0 && GetDirection() == Up) {
       game_info_.pause = LOSED;
-    } else if (snake_coordinates_.front().y > FIELD_H - 1 &&
+    } else if (snake_coordinates_.front().y >= FIELD_H - 1 &&
                GetDirection() == Down) {
       game_info_.pause = LOSED;
     } else if (game_info_.score == 200) {

@@ -203,18 +203,23 @@ void SnakeView::DrawGameField(WINDOW *win, const GameInfo &game_info) {
   for (int y = 0; y < FIELD_H; ++y) {
     for (int x = 0; x < FIELD_W; ++x) {
       switch (game_info.field[x][y]) {
+        case 0: 
+          wattron(win, COLOR_PAIR(1));
+          mvwaddch(win, y+1, x+1, '.');
+          wattroff(win, COLOR_PAIR(1));
+          break;
         case 1: // Тело змейки
-          mvwaddch(win, y, x, 'o');
+          mvwaddch(win, y+1, x+1, 'o');
           break;
         case 2: // Голова змейки
-          mvwaddch(win, y, x, '0');
+          mvwaddch(win, y+1, x+1, '0');
           break;
         case 3: // Яблоко
           wattron(win, COLOR_PAIR(3));
-          mvwaddch(win, y, x, '@');
+          mvwaddch(win, y+1, x+1, '@');
           wattroff(win, COLOR_PAIR(3));
           break;
-        default: // Пустая клетка (0) - ничего не рисуем
+        default: 
           break;
       }
     }
