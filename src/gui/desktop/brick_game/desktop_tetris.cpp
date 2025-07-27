@@ -28,7 +28,7 @@ void TetrisQT::paintEvent(QPaintEvent *event){
 
 }
 
-void TetrisQT::DrawInfoBar(QPainter &painter, const Game_Info *game_info) {
+void TetrisQT::DrawInfoBar(QPainter &painter, const GameInfo *game_info) {
     QPen pen(Qt::black);
     painter.setPen(pen);
 
@@ -45,7 +45,7 @@ void TetrisQT::DrawInfoBar(QPainter &painter, const Game_Info *game_info) {
     painter.drawText(275, 270, QString::number(game_info->high_score));
 }
 
-void TetrisQT::DrawPlayField(QPainter &painter, const Game_Info *game_info){
+void TetrisQT::DrawPlayField(QPainter &painter, const GameInfo *game_info){
     painter.save();
 
     painter.setBrush(QBrush(Qt::red));
@@ -83,7 +83,7 @@ void TetrisQT::DrawTetromino(QPainter &painter, const Tetromino *tet){
 
 }
 
-void TetrisQT::DrawNextTetromino(QPainter &painter, const Game_Info *game_info, int infoX, int infoY){
+void TetrisQT::DrawNextTetromino(QPainter &painter, const GameInfo *game_info, int infoX, int infoY){
     painter.setBrush(QBrush(Qt::blue));
     painter.setPen(Qt::NoPen);
 

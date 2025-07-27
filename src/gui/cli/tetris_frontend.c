@@ -1,6 +1,6 @@
 #include "../../inc/tetris/tetris_frontend.h"
-
 #include "../../inc/tetris/fsm.h"
+#include "../../inc/game_common.h"
 
 /** @file */
 
@@ -33,7 +33,7 @@ void game_loop() {
   srand(time(NULL));
   generate_figure();
 
-  Game_Info *game_info = get_game_info();
+  GameInfo *game_info = get_game_info();
   Tetromino *tet = set_tetromino(game_info);
   int key = 0;
 
@@ -80,34 +80,9 @@ void game_loop() {
  * the corresponding action.
  * @param[in] sign the user input character.
  */
-void user_input(Tetromino *tet, Game_Info *game_info, int sign) {
-  switch (sign) {
-    case '\n':
-      get_signal(tet, game_info, Start);
-      break;
-    case 'p':
-    case 'P':
-      get_signal(tet, game_info, Pause);
-      break;
-    case 'q':
-    case 'Q':
-      get_signal(tet, game_info, Terminate);
-      break;
-    case ' ':
-      get_signal(tet, game_info, Action);
-      break;
-    case KEY_LEFT:
-      get_signal(tet, game_info, Left);
-      break;
-    case KEY_RIGHT:
-      get_signal(tet, game_info, Right);
-      break;
-    case KEY_DOWN:
-      get_signal(tet, game_info, Down);
-      break;
-    default:
-      get_signal(tet, game_info, Up);
-  }
+void user_input(Tetromino *tet, GameInfo *game_info, int sign) {
+  UserAction action = handle_user_input(sign);
+  get_signal(tet, game_info, action);
 }
 
 /**
@@ -144,28 +119,7 @@ void init_ncurses() {
  * @param[in] left_x the x-coordinate of the left of the rectangle.
  * @param[in] right_x the x-coordinate of the right of the rectangle.
  */
-void print_rectangle(WINDOW *win, int top_y, int bottom_y, int left_x,
-                     int right_x) {
-  mvwaddch(win, top_y, left_x, ACS_ULCORNER);
 
-  int i = left_x + 1;
-  for (; i < right_x; i++) {
-    mvwaddch(win, top_y, i, ACS_HLINE);
-  }
-  mvwaddch(win, top_y, i, ACS_URCORNER);
-
-  for (int i = top_y + 1; i < bottom_y; i++) {
-    mvwaddch(win, i, left_x, ACS_VLINE);
-    mvwaddch(win, i, right_x, ACS_VLINE);
-  }
-
-  mvwaddch(win, bottom_y, left_x, ACS_LLCORNER);
-  i = left_x + 1;
-  for (; i < right_x; i++) {
-    mvwaddch(win, bottom_y, i, ACS_HLINE);
-  }
-  mvwaddch(win, bottom_y, i, ACS_LRCORNER);
-}
 
 /**
  * @brief Prints the playing field on a given window.
@@ -176,9 +130,9 @@ void print_rectangle(WINDOW *win, int top_y, int bottom_y, int left_x,
  *
  * @param[in] win the window to draw the field on.
  */
-void print_field(WINDOW *win) {
-  print_rectangle(win, 0, FIELD_HEIGHT, 0, FIELD_WIDTH);
-}
+// void print_field(WINDOW *win) {
+//   print_rectangle(win, 0, FIELD_HEIGHT, 0, FIELD_WIDTH + 18);
+// }
 
 /**
  * @brief Prints the info bar on a given window.
@@ -189,20 +143,8 @@ void print_field(WINDOW *win) {
  * @param[in] win the window to draw the bar on.
  * @param[in] game_info the game info structure containing the game info.
  */
-void print_info_bar(WINDOW *win, Game_Info *game_info) {
-  print_rectangle(win, 0, 4, FIELD_WIDTH + 2, FIELD_WIDTH + 18);
-  mvwprintw(win, 1, 19, "Level:");
-  mvwprintw(win, 3, 21, "%d", game_info->level);
-
-  print_rectangle(win, 5, 9, FIELD_WIDTH + 2, FIELD_WIDTH + 18);
-  mvwprintw(win, 6, 19, "Score:");
-  mvwprintw(win, 8, 16, "%6d", game_info->score);
-
-  print_rectangle(win, 10, 14, FIELD_WIDTH + 2, FIELD_WIDTH + 18);
-  mvwprintw(win, 11, 16, "High Score:");
-  mvwprintw(win, 13, 16, "%6d", game_info->high_score);
-
-  print_rectangle(win, 15, FIELD_HEIGHT, FIELD_WIDTH + 2, FIELD_WIDTH + 18);
+void print_info_bar(WINDOW *win/*, GameInfo *game_info*/) {
+  //print_info_bar(win, game_info);
   mvwprintw(win, 16, 19, "Next:");
 }
 
@@ -220,7 +162,7 @@ void print_info_bar(WINDOW *win, Game_Info *game_info) {
  * @param[in] game_info the game info structure containing additional game data.
  */
 void print_play_field(WINDOW *win, int **play_field, Tetromino *tet,
-                      Game_Info *game_info) {
+                      GameInfo *game_info) {
   for (int i = 0; i < FIELD_H; i++) {
     for (int j = 0; j < FIELD_W; j++) {
       if (play_field[i][j] == 1) {
@@ -273,7 +215,7 @@ void draw_tetromino_on_field(WINDOW *win, Tetromino *tet) {
  * @param[in] game_info The game information structure, which contains the next
  * tetromino's figure array.
  */
-void draw_next_tetromino_in_info(WINDOW *win, Game_Info *game_info) {
+void draw_next_tetromino_in_info(WINDOW *win, GameInfo *game_info) {
   for (int y = 0; y < MAX_FIGURE_SIZE; y++) {
     for (int x = 0; x < MAX_FIGURE_SIZE; x++) {
       if (game_info->next[y][x]) {
@@ -303,7 +245,7 @@ void draw_next_tetromino_in_info(WINDOW *win, Game_Info *game_info) {
  * game data.
  */
 void refresh_game(WINDOW *win, int **play_field, Tetromino *tet,
-                  Game_Info *game_info) {
+                  GameInfo *game_info) {
   print_field(win);
   print_play_field(win, play_field, tet, game_info);
   print_info_bar(win, game_info);
@@ -353,7 +295,7 @@ void print_pause_sceen(WINDOW *win) {
  *
  * @param[in] win The window to draw the game over screen on.
  */
-void print_game_over_screen(WINDOW *win, Game_Info *game_info) {
+void print_game_over_screen(WINDOW *win, GameInfo *game_info) {
   print_rectangle(win, 0, FIELD_HEIGHT, 0, FIELD_WIDTH + 18);
   if (game_info->score == game_info->high_score &&
       game_info->high_score >= 100) {
@@ -374,7 +316,7 @@ void print_game_over_screen(WINDOW *win, Game_Info *game_info) {
  * the Enter key and then deletes the window and clears the screen.
  */
 
-void start_screen(WINDOW *startwin, Tetromino *tet, Game_Info *game_info) {
+void start_screen(WINDOW *startwin, Tetromino *tet, GameInfo *game_info) {
   int key = 0;
 
   while (game_info->pause == NOT_STARTED) {
@@ -396,7 +338,7 @@ void start_screen(WINDOW *startwin, Tetromino *tet, Game_Info *game_info) {
  *
  * @param[in] win The window to draw the game over screen on.
  */
-void game_over_scree(WINDOW *win, Game_Info *game_info) {
+void game_over_scree(WINDOW *win, GameInfo *game_info) {
   WINDOW *game_over_win = newwin(20 * 3 + 1, 20 * 2 + 1, 1, 1);
 
   werase(win);

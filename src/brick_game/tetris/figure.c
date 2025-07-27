@@ -1,5 +1,6 @@
 #include "../../inc/tetris/figures.h"
 #include "../../inc/tetris/tetris.h"
+#include "../../inc/game_common.h"
 /** @file */
 
 /**
@@ -11,7 +12,7 @@
  *
  * @return Pointer to Tetromino structure
  */
-Tetromino *set_tetromino(Game_Info *game_info) {
+Tetromino *set_tetromino(GameInfo *game_info) {
   Tetromino *tetromino = calloc(1, sizeof(Tetromino));
 
   tetromino->type = generate_figure();
@@ -60,7 +61,7 @@ void set_start_position_for_tetromino(Tetromino *tetromino) {
  * @param game_info - pointer to the Game_Info structure
  * @param figures - array of figures
  */
-void generate_next_tetromino(Tetromino *tetromino, Game_Info *game_info,
+void generate_next_tetromino(Tetromino *tetromino, GameInfo *game_info,
                              int figures[7][4][4]) {
   tetromino->type = tetromino->next_type;
   for (int y = 0; y < MAX_FIGURE_SIZE; y++) {
@@ -92,7 +93,7 @@ void generate_next_tetromino(Tetromino *tetromino, Game_Info *game_info,
  * @param game_info - pointer to the Game_Info structure
  * @param figures - array of figures
  */
-void spawn_new_figure(Tetromino *tetromino, Game_Info *game_info,
+void spawn_new_figure(Tetromino *tetromino, GameInfo *game_info,
                       int figures[7][4][4]) {
   if (tetromino->is_placed && tetromino->can_spawn) {
     place_tetromino_on_field(tetromino, game_info);
@@ -112,7 +113,7 @@ void spawn_new_figure(Tetromino *tetromino, Game_Info *game_info,
  * @param tet - pointer to the Tetromino structure
  * @param game_info - pointer to the Game_Info structure
  */
-void move_tetromino_down_one_row(Tetromino *tet, Game_Info *game_info) {
+void move_tetromino_down_one_row(Tetromino *tet, GameInfo *game_info) {
   int can_move = 1;
   for (int y = 0; y < MAX_FIGURE_SIZE; y++) {
     for (int x = 0; x < MAX_FIGURE_SIZE; x++) {
@@ -149,7 +150,7 @@ void move_tetromino_down_one_row(Tetromino *tet, Game_Info *game_info) {
  * @param tet - pointer to the Tetromino structure
  * @param game_info - pointer to the Game_Info structure
  */
-void drop_tetromino(Tetromino *tet, Game_Info *game_info) {
+void drop_tetromino(Tetromino *tet, GameInfo *game_info) {
   if (game_info->pause == STARTED) move_tetromino_down_one_row(tet, game_info);
 }
 
@@ -164,7 +165,7 @@ void drop_tetromino(Tetromino *tet, Game_Info *game_info) {
  * @param tet - pointer to the Tetromino structure
  * @param game_info - pointer to the Game_Info structure
  */
-void move_tetromino_left(Tetromino *tet, Game_Info *game_info) {
+void move_tetromino_left(Tetromino *tet, GameInfo *game_info) {
   int can_move = 1;
   for (int y = 0; y < MAX_FIGURE_SIZE; y++) {
     for (int x = 0; x < MAX_FIGURE_SIZE; x++) {
@@ -199,7 +200,7 @@ void move_tetromino_left(Tetromino *tet, Game_Info *game_info) {
  * @param tet - pointer to the Tetromino structure
  * @param game_info - pointer to the Game_Info structure
  */
-void move_tetromino_right(Tetromino *tet, Game_Info *game_info) {
+void move_tetromino_right(Tetromino *tet, GameInfo *game_info) {
   int can_move = 1;
   for (int y = 0; y < MAX_FIGURE_SIZE; y++) {
     for (int x = 0; x < MAX_FIGURE_SIZE; x++) {
@@ -235,7 +236,7 @@ void move_tetromino_right(Tetromino *tet, Game_Info *game_info) {
  * @param tet - pointer to the Tetromino structure
  * @param game_info - pointer to the Game_Info structure
  */
-void rotate_tetromino(Tetromino *tet, Game_Info *game_info) {
+void rotate_tetromino(Tetromino *tet, GameInfo *game_info) {
   int rotated[MAX_FIGURE_SIZE][MAX_FIGURE_SIZE];
 
   int can_rotate = 1;

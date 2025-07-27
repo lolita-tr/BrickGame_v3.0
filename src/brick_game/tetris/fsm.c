@@ -1,4 +1,5 @@
 #include "../../inc/tetris/fsm.h"
+#include "../../inc/game_common.h"
 
 /** @file */
 
@@ -12,7 +13,7 @@
  *
  * @return void
  */
-void get_signal(Tetromino *tet, Game_Info *game_info, Signals action) {
+void get_signal(Tetromino *tet, GameInfo *game_info, UserAction action) {
   switch (action) {
     case Start:
       start_game(tet, game_info);

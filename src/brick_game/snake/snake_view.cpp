@@ -1,6 +1,6 @@
 #include "../../inc/snake/snake_view.h"
-
 #include "../../inc/snake/snake.h"
+#include "../../inc/game_common.h"
 
 /** @file */
 
@@ -29,7 +29,7 @@ void SnakeView::StartSnakeGame() {
   WINDOW *startwin = newwin(20 * 3 + 1, 20 * 2 + 1, 1, 1);
 
   while (controller_.snake_.GetPauseState() == NOT_STARTED) {
-    PrintRectangle(startwin, 0, FIELD_HEIGHT, 0, FIELD_WIDTH + 18);
+    print_rectangle(startwin, 0, FIELD_HEIGHT, 0, FIELD_WIDTH + 18);
     mvwprintw(startwin, 10, 6, "Press Enter to start");
     HandelInput();
     wrefresh(startwin);
@@ -57,78 +57,56 @@ void SnakeView::StartSnakeGame() {
  * return any value.
  */
 
+
 void SnakeView::HandelInput() {
   int ch = getch();
-  switch (ch) {
-    case KEY_UP:
-      controller_.UserInput(Up, false);
-      break;
+  UserAction action = handle_user_input(ch);
 
-    case KEY_DOWN:
-      controller_.UserInput(Down, false);
-      break;
-
-    case KEY_LEFT:
-      controller_.UserInput(Left, false);
-      break;
-
-    case KEY_RIGHT:
-      controller_.UserInput(Right, false);
-      break;
-
-    case 'p':
-    case 'P':
-      controller_.UserInput(Pause, false);
-      break;
-
-    case 'q':
-    case 'Q':
-      controller_.UserInput(Terminate, false);
-      break;
-    case '\n':
-      controller_.UserInput(Start, false);
-      break;
-    case ' ':
-      controller_.UserInput(Action, true);
-      break;
+  bool hold = false;
+  if (action == Action) {
+    hold = true;
   }
+
+  controller_.UserInput(action, hold);
 }
+// void SnakeView::HandelInput() {
+//   int ch = getch();
+//   switch (ch) {
+//     case KEY_UP:
+//       controller_.UserInput(Up, false);
+//       break;
 
-/**
- * @brief Prints a rectangle on a given window.
- *
- * Prints a rectangle on a given window with the specified coordinates. The
- * rectangle is drawn using the ncurses extended characters for lines and
- * corners.
- *
- * @param[in] win the window to draw the rectangle on.
- * @param[in] top_y the y-coordinate of the top of the rectangle.
- * @param[in] bottom_y the y-coordinate of the bottom of the rectangle.
- * @param[in] left_x the x-coordinate of the left of the rectangle.
- * @param[in] right_x the x-coordinate of the right of the rectangle.
- */
-void PrintRectangle(WINDOW *win, int top_y, int bottom_y, int left_x,
-                    int right_x) {
-  mvwaddch(win, top_y, left_x, ACS_ULCORNER);
+//     case KEY_DOWN:
+//       controller_.UserInput(Down, false);
+//       break;
 
-  int i = left_x + 1;
-  while (i < right_x) {
-    mvwaddch(win, top_y, i++, ACS_HLINE);
-  }
-  mvwaddch(win, top_y, i, ACS_URCORNER);
+//     case KEY_LEFT:
+//       controller_.UserInput(Left, false);
+//       break;
 
-  for (int i = top_y + 1; i < bottom_y; i++) {
-    mvwaddch(win, i, left_x, ACS_VLINE);
-    mvwaddch(win, i, right_x, ACS_VLINE);
-  }
+//     case KEY_RIGHT:
+//       controller_.UserInput(Right, false);
+//       break;
 
-  mvwaddch(win, bottom_y, left_x, ACS_LLCORNER);
-  i = left_x + 1;
-  while (i < right_x) {
-    mvwaddch(win, bottom_y, i++, ACS_HLINE);
-  }
-  mvwaddch(win, bottom_y, i, ACS_LRCORNER);
-}
+//     case 'p':
+//     case 'P':
+//       controller_.UserInput(Pause, false);
+//       break;
+
+//     case 'q':
+//     case 'Q':
+//       controller_.UserInput(Terminate, false);
+//       break;
+//     case '\n':
+//       controller_.UserInput(Start, false);
+//       break;
+//     case ' ':
+//       controller_.UserInput(Action, true);
+//       break;
+//   }
+// }
+
+
 
 /**
  * @brief Prints the game field border.
@@ -138,7 +116,7 @@ void PrintRectangle(WINDOW *win, int top_y, int bottom_y, int left_x,
  * @param[in] win the window to draw the game field on.
  */
 void SnakeView::PrintField(WINDOW *win) {
-  PrintRectangle(win, 0, FIELD_HEIGHT, 0, FIELD_WIDTH);
+  print_field(win);
 }
 
 /**
@@ -153,19 +131,8 @@ void SnakeView::PrintField(WINDOW *win) {
  */
 
 void SnakeView::PrintInfoBar(WINDOW *win) {
-  PrintRectangle(win, 0, 4, FIELD_WIDTH + 2, FIELD_WIDTH + 18);
-  mvwprintw(win, 1, 19, "Level:");
-  mvwprintw(win, 3, 21, "%d", controller_.snake_.GetLevel());
-
-  PrintRectangle(win, 5, 9, FIELD_WIDTH + 2, FIELD_WIDTH + 18);
-  mvwprintw(win, 6, 19, "Score:");
-  mvwprintw(win, 8, 16, "%6d", controller_.snake_.GetScore());
-
-  PrintRectangle(win, 10, 14, FIELD_WIDTH + 2, FIELD_WIDTH + 18);
-  mvwprintw(win, 11, 16, "High Score:");
-  mvwprintw(win, 13, 16, "%6d", controller_.snake_.GetHighScore());
-
-  PrintRectangle(win, 15, FIELD_HEIGHT, FIELD_WIDTH + 2, FIELD_WIDTH + 18);
+  GameInfo game_info = controller_.snake_.GetGameInfo();
+  print_info_bar(win, &game_info);
 }
 
 /**
@@ -238,13 +205,7 @@ void SnakeView::DrawGameField(WINDOW *win, const GameInfo &game_info) {
  * @param[in] win the window to print the message on.
  */
 void SnakeView::PrintOtherMessage(WINDOW *win) {
-  if (controller_.snake_.GetPauseState() == PAUSED) {
-    mvwprintw(win, 1, 1, "PAUSE");
-  } else if (controller_.snake_.GetPauseState() == WIN) {
-    mvwprintw(win, 1, 1, "You won!!!");
-  } else if (controller_.snake_.GetPauseState() == LOSED) {
-    mvwprintw(win, 1, 1, "You lost!");
-  }
+  print_other_message(win, controller_.snake_.GetPauseState());
 }
 
 }  // namespace s21

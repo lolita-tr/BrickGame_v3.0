@@ -23,8 +23,9 @@ SnakeController::SnakeController(Snake &snakeInstance)
  * held.
  */
 
-void SnakeController::UserInput(s21::UserAction action, bool hold) {
+void SnakeController::UserInput(UserAction action, bool hold) {
   if (snake_.GetPauseState() == STARTED) {
+    
     if (snake_.GetMoveFlag()) {
       switch (action) {
         case Up:
@@ -50,7 +51,7 @@ void SnakeController::UserInput(s21::UserAction action, bool hold) {
         default:
           break;
       }
-    }
+   }
   }
   switch (action) {
     case Terminate:

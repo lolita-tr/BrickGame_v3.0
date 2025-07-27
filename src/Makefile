@@ -3,6 +3,7 @@ CXX = g++
 CFLAGS = -std=c++17 -pthread -Wall -Werror -Wextra -lstdc++
 FLAGS = -Wall -Werror -Wextra
 
+COMMON_DIR = brick_game/common
 TET_DIR = brick_game/tetris
 SNAKE_DIR = brick_game/snake
 BUILD_DIR = build
@@ -33,12 +34,13 @@ install: $(BUILD_DIR)/tetris_lib.a $(BUILD_DIR)/snake_lib.a
 	$(SNAKE_DIR)/snake_view.cpp gui/cli/tetris_frontend.c \
 	$(BUILD_DIR)/tetris_lib.a $(BUILD_DIR)/snake_lib.a -lncurses
 
-	cd $(BUILD_DIR) && /usr/local/Qt-6.6.2/bin/qmake ../gui/desktop/brick_game && make
+#   TODO:
+#	cd $(BUILD_DIR) && /usr/local/Qt-6.6.2/bin/qmake ../gui/desktop/brick_game && make не собирается qt надо подумать как сделать
 
 $(BUILD_DIR)/tetris_lib.a: $(BUILD_DIR)/field.o $(BUILD_DIR)/figure.o \
-	$(BUILD_DIR)/fsm.o $(BUILD_DIR)/utility.o
+	$(BUILD_DIR)/fsm.o $(BUILD_DIR)/utility.o $(BUILD_DIR)/game_common.o
 	ar rcs $(BUILD_DIR)/tetris_lib.a $(BUILD_DIR)/field.o $(BUILD_DIR)/figure.o \
-	$(BUILD_DIR)/fsm.o $(BUILD_DIR)/utility.o
+	$(BUILD_DIR)/fsm.o $(BUILD_DIR)/utility.o $(BUILD_DIR)/game_common.o
 	ranlib $(BUILD_DIR)/tetris_lib.a
 
 $(BUILD_DIR)/field.o: $(TET_DIR)/field.c | $(BUILD_DIR)
@@ -53,14 +55,18 @@ $(BUILD_DIR)/fsm.o: $(TET_DIR)/fsm.c | $(BUILD_DIR)
 $(BUILD_DIR)/utility.o: $(TET_DIR)/utility.c | $(BUILD_DIR)
 	$(CC) $(FLAGS) -c $(TET_DIR)/utility.c -o $(BUILD_DIR)/utility.o
 
+$(BUILD_DIR)/game_common.o: $(COMMON_DIR)/game_common.c | $(BUILD_DIR)
+	$(CC) $(FLAGS) -c $(COMMON_DIR)/game_common.c -o $(BUILD_DIR)/game_common.o
+
 $(BUILD_DIR)/snake.o: | $(BUILD_DIR)
 	$(CXX) $(CFLAGS) -c $(SNAKE_DIR)/snake.cpp -o $(BUILD_DIR)/snake.o
 
 $(BUILD_DIR)/Controller.o: | $(BUILD_DIR)
 	$(CXX) $(CFLAGS) -c $(SNAKE_DIR)/snake_controller.cpp -o $(BUILD_DIR)/Controller.o
 
-$(BUILD_DIR)/snake_lib.a: $(BUILD_DIR)/snake.o $(BUILD_DIR)/Controller.o
-	ar rcs $(BUILD_DIR)/snake_lib.a $(BUILD_DIR)/*.o
+
+$(BUILD_DIR)/snake_lib.a: $(BUILD_DIR)/snake.o $(BUILD_DIR)/Controller.o $(BUILD_DIR)/game_common.o
+	ar rcs $(BUILD_DIR)/snake_lib.a $(BUILD_DIR)/*.o $(BUILD_DIR)/game_common.o
 	rm -rf $(BUILD_DIR)/*.o
 	ranlib $(BUILD_DIR)/snake_lib.a
 

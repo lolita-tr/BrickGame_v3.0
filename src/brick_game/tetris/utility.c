@@ -1,5 +1,6 @@
 #include "../../inc/tetris/figures.h"
 #include "../../inc/tetris/tetris.h"
+#include "../../inc/game_common.h"
 /** @file */
 
 /**
@@ -12,7 +13,7 @@
  * @param game_info The game information
  * @param counter The number of cleared lines
  */
-void score_update(Game_Info *game_info, int counter) {
+void score_update(GameInfo *game_info, int counter) {
   if (counter == 1) {
     game_info->score += 100;
   } else if (counter == 2) {
@@ -40,7 +41,7 @@ void score_update(Game_Info *game_info, int counter) {
  * @param game_info The game information structure containing score, level, and
  * speed
  */
-void level_speed_update(Game_Info *game_info) {
+void level_speed_update(GameInfo *game_info) {
   if (game_info->level < LEVEL_MAX) {
     game_info->level = game_info->score / 600;
 
@@ -58,14 +59,8 @@ void level_speed_update(Game_Info *game_info) {
  *
  * @param game_info The game information structure containing the high score
  */
-void save_high_score(Game_Info *game_info) {
-  int high_score = game_info->high_score;
-  FILE *file = fopen(HIGH_SCORE_PATH, "w");
-
-  if (file) {
-    fprintf(file, "%d", high_score);
-    fclose(file);
-  }
+void save_high_score(GameInfo *game_info) {
+  save_high_score_to_file(HIGH_SCORE_PATH, game_info->high_score);
 }
 
 /**
@@ -79,17 +74,7 @@ void save_high_score(Game_Info *game_info) {
  * @return The high score read from the file
  */
 int get_high_score() {
-  int high_score = 0;
-  char high_score_string[100];
-  FILE *file = fopen(HIGH_SCORE_PATH, "r");
-
-  if (file) {
-    while (fgets(high_score_string, 100, file)) {
-      high_score = atoi(high_score_string);
-    }
-    fclose(file);
-  }
-  return high_score;
+  return get_high_score_from_file(HIGH_SCORE_PATH);
 }
 
 /**
@@ -112,7 +97,7 @@ int generate_figure() { return rand() % 7; }
  * @param game_info The game information structure, which contains the pause
  * flag
  */
-void pause_game(Game_Info *game_info) {
+void pause_game(GameInfo *game_info) {
   if (game_info->pause == STARTED) {
     game_info->pause = PAUSED;
   } else {
@@ -120,9 +105,9 @@ void pause_game(Game_Info *game_info) {
   }
 }
 
-void terminate_game(Game_Info *game_info) { game_info->pause = QUIT; }
+void terminate_game(GameInfo *game_info) { game_info->pause = QUIT; }
 
-void start_game(Tetromino *tet, Game_Info *game_info) {
+void start_game(Tetromino *tet, GameInfo *game_info) {
   game_info->pause = STARTED;
   spawn_new_figure(tet, game_info, figures);
 }
@@ -169,7 +154,7 @@ void free_tetromino(Tetromino *tetromino) {
  *
  * @param game_info Pointer to the Game_Info to be freed.
  */
-void free_game(Game_Info *game_info) {
+void free_game(GameInfo *game_info) {
   if (game_info == NULL) return;
 
   for (int i = 0; i < MAX_FIGURE_SIZE; i++) {

@@ -1,5 +1,6 @@
 #include "../../inc/tetris/figures.h"
 #include "../../inc/tetris/tetris.h"
+#include "../../inc/game_common.h"
 
 /** @file */
 
@@ -12,7 +13,7 @@
  * @param tetromino - pointer to the Tetromino structure
  * @param game_info - pointer to the Game_Info structure
  */
-void game_update(Tetromino *tetromino, Game_Info *game_info) {
+void game_update(Tetromino *tetromino, GameInfo *game_info) {
   spawn_new_figure(tetromino, game_info, figures);
   int cleared = clear_line(game_info);
   line_dropper(game_info);
@@ -26,8 +27,8 @@ void game_update(Tetromino *tetromino, Game_Info *game_info) {
  *          on the first call and return the same pointer on subsequent calls.
  * @return A pointer to the game information structure
  */
-Game_Info *get_game_info() {  // изменила
-  Game_Info *game_info = calloc(1, sizeof(Game_Info));
+GameInfo *get_game_info() {
+  GameInfo *game_info = calloc(1, sizeof(GameInfo));
 
   game_info->field = calloc(FIELD_H, sizeof(int **));
   for (int i = 0; i < FIELD_H; i++) {
@@ -39,7 +40,7 @@ Game_Info *get_game_info() {  // изменила
     game_info->next[i] = calloc(MAX_FIGURE_SIZE, sizeof(int));
   }
 
-  game_info->high_score = get_high_score();
+  game_info->high_score = get_high_score_from_file(HIGH_SCORE_PATH);
   game_info->level = LEVEL_MIN;
   game_info->speed = SPEED_1;
   game_info->pause = NOT_STARTED;
@@ -57,7 +58,7 @@ Game_Info *get_game_info() {  // изменила
  * @param tetromino A pointer to the tetromino structure
  * @param game_info A pointer to the game information structure
  */
-void place_tetromino_on_field(Tetromino *tetromino, Game_Info *game_info) {
+void place_tetromino_on_field(Tetromino *tetromino, GameInfo *game_info) {
   if (tetromino->is_placed) {
     for (int y = 0; y < MAX_FIGURE_SIZE; y++) {
       for (int x = 0; x < MAX_FIGURE_SIZE; x++) {
@@ -82,7 +83,7 @@ void place_tetromino_on_field(Tetromino *tetromino, Game_Info *game_info) {
  * @param game_info A pointer to the game information structure
  * @return The number of cleared rows
  */
-int clear_line(Game_Info *game_info) {
+int clear_line(GameInfo *game_info) {
   int line_counter = 0;
   for (int y = 0; y < FIELD_H; y++) {
     int line_incomplete = 0;
@@ -109,7 +110,7 @@ int clear_line(Game_Info *game_info) {
  *          drops have been performed or the top of the field is reached.
  * @param game_info A pointer to the game information structure.
  */
-void line_dropper(Game_Info *game_info) {
+void line_dropper(GameInfo *game_info) {
   int counter = 100;
   for (int y = FIELD_H - 1; y > 0 && counter; y--) {
     int line_clear = 1;
@@ -141,7 +142,7 @@ void line_dropper(Game_Info *game_info) {
  * @param tetromino A pointer to the tetromino structure.
  * @param game_info A pointer to the game information structure.
  */
-void check_game_over(Tetromino *tetromino, Game_Info *game_info) {
+void check_game_over(Tetromino *tetromino, GameInfo *game_info) {
   for (int y = 1; y < MAX_FIGURE_SIZE; y++) {
     for (int x = 0; x < MAX_FIGURE_SIZE; x++) {
       if (game_info->field[tetromino->coord.y + y][tetromino->coord.x + x] &&

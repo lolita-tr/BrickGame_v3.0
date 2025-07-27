@@ -12,28 +12,10 @@
 #include <iostream>
 
 #include "../defines.h"
+#include "../../inc/game_common.h"
 
 namespace s21 {
-struct GameInfo {
-  int** field;
-  int** apple;
-  int score;
-  int high_score;
-  int level;
-  int speed;
-  int pause;
-};
-
-typedef enum {
-  Start,
-  Pause,
-  Terminate,
-  Action,
-  Left,
-  Right,
-  Up,
-  Down
-} UserAction;
+// Using common GameInfo and UserAction from game_common.h
 
 class Snake {
  public:
@@ -71,18 +53,20 @@ class Snake {
   void UpdateLevelSpeed();
   void ResetSnake();
 
+  // Access to apple coordinates (stored in next field of GameInfo)
+
   const GameInfo& GetGameInfo() const { return game_info_; };
   void SetGameInfo(const GameInfo& game_info) { game_info_ = game_info; };
 
   const int* const* GetField() const { return game_info_.field; };
-  const int* const* GetApple() const { return game_info_.apple; };
+  const int* const* GetApple() const { return game_info_.next; };
 
   void SetField(int** new_field) { game_info_.field = new_field; }
-  void SetApple(int** new_apple) { game_info_.apple = new_apple; }
+  void SetApple(int** new_apple) { game_info_.next = new_apple; }
 
   void SetAppleValue(int row, int col, int value) {
-    if (game_info_.apple != nullptr) {
-      game_info_.apple[row][col] = value;
+    if (game_info_.next != nullptr) {
+      game_info_.next[row][col] = value;
     }
   }
 

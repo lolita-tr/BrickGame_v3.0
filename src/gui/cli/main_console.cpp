@@ -2,6 +2,7 @@
 #include "../../inc/snake/snake_controller.h"
 #include "../../inc/snake/snake_view.h"
 #include "../../inc/tetris/tetris.h"
+#include "../../inc/game_common.h"
 
 /** @file */
 
@@ -43,7 +44,7 @@ namespace s21 {
  */
 void DrawMenuScreen(int choosen_point) {
   WINDOW *menuwin = newwin(20 * 3 + 1, 20 * 2 + 1, 1, 1);
-  PrintRectangle(menuwin, 0, FIELD_HEIGHT, 0, FIELD_WIDTH + 18);
+  print_rectangle(menuwin, 0, FIELD_HEIGHT, 0, FIELD_WIDTH + 18);
   switch (choosen_point) {
     case 0:
       wattron(menuwin, COLOR_PAIR(3));

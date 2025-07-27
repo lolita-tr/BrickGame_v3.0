@@ -1,4 +1,5 @@
 #include "../../inc/snake/snake.h"
+#include "../../inc/game_common.h"
 
 /** @file */
 
@@ -20,10 +21,12 @@ Snake::Snake() {
     game_info_.field[i] = new int[FIELD_H]();
   }
 
-  game_info_.apple = new int *[1];
-  game_info_.apple[0] = new int[2]();
+  game_info_.next = new int *[1];
+  game_info_.next[0] = new int[2]();
+  game_info_.next[0][0] = -1;  // Инициализируем с невалидными координатами
+  game_info_.next[0][1] = -1;
 
-  game_info_.high_score = GetHighScore();
+  game_info_.high_score = get_high_score_from_file(HIGH_SCORE_PATH_SNAKE);
   game_info_.level = LEVEL_MIN;
   game_info_.speed = SPEED_1_SNAKE;
   game_info_.pause = NOT_STARTED;
@@ -47,8 +50,8 @@ Snake::~Snake() {
   }
   delete[] game_info_.field;
 
-  delete[] game_info_.apple[0];
-  delete[] game_info_.apple;
+  delete[] game_info_.next[0];
+  delete[] game_info_.next;
 }
 
 /**
@@ -66,8 +69,8 @@ void Snake::GenerateApple() {
     position.y = rand() % FIELD_H;
   } while (CheckSnakeBody(position.x, position.y));
 
-  game_info_.apple[0][0] = position.x;
-  game_info_.apple[0][1] = position.y;
+  game_info_.next[0][0] = position.x;
+  game_info_.next[0][1] = position.y;
 
   game_info_.field[position.x][position.y] = 3;  // 3 - яблоко
 }
@@ -113,7 +116,7 @@ void Snake::InitSnake() {
  * @param action The direction in which to move the snake.
  */
 
-void Snake::MoveSnake(s21::UserAction action) {
+void Snake::MoveSnake(UserAction action) {
   CheckEndGame();
   if (game_info_.pause != STARTED) {
     return;
@@ -266,8 +269,8 @@ void Snake::PauseGame() {
  */
 
 bool Snake::CheckAteApple() {
-  if (snake_coordinates_.front().x == game_info_.apple[0][0] &&
-      snake_coordinates_.front().y == game_info_.apple[0][1]) {
+  if (snake_coordinates_.front().x == game_info_.next[0][0] &&
+      snake_coordinates_.front().y == game_info_.next[0][1]) {
     ++game_info_.score;
     return true;
   }
@@ -365,17 +368,7 @@ UserAction Snake::GetDirection() { return this->direction_; }
  * @return The high score read from the file
  */
 int Snake::GetHighScore() {
-  int high_score = 0;
-  char high_score_string[100];
-  FILE *file = fopen(HIGH_SCORE_PATH_SNAKE, "r");
-
-  if (file) {
-    while (fgets(high_score_string, 100, file)) {
-      high_score = atoi(high_score_string);
-    }
-    fclose(file);
-  }
-  return high_score;
+  return get_high_score_from_file(HIGH_SCORE_PATH_SNAKE);
 }
 
 /**
@@ -391,13 +384,7 @@ int Snake::GetHighScore() {
 
 void Snake::SaveHighScore() {
   if (game_info_.score >= game_info_.high_score) {
-    int high_score = game_info_.score;
-    FILE *file = fopen(HIGH_SCORE_PATH_SNAKE, "w");
-
-    if (file) {
-      fprintf(file, "%d", high_score);
-      fclose(file);
-    }
+    save_high_score_to_file(HIGH_SCORE_PATH_SNAKE, game_info_.score);
   }
 }
 
@@ -412,12 +399,7 @@ void Snake::SaveHighScore() {
  * If it is, it updates the high score and calls SaveHighScore.
  */
 void Snake::UpdateLevelSpeed() {
-  if (game_info_.level < LEVEL_MAX) {
-    if (game_info_.score % 5 == 0) {
-      ++game_info_.level;
-      game_info_.speed -= SPEED_STEP_SNAKE;
-    }
-  }
+  update_level_speed(&game_info_, SPEED_STEP_SNAKE);
 
   if (game_info_.score > game_info_.high_score) {
     game_info_.high_score = game_info_.score;
@@ -447,15 +429,17 @@ void Snake::ResetSnake() {
   }
 
   for (int i = 0; i < 1; ++i) {
-    delete[] game_info_.apple[i];
+    delete[] game_info_.next[i];
   }
-  delete[] game_info_.apple;
+  delete[] game_info_.next;
 
-  game_info_.apple = new int *[1];
-  game_info_.apple[0] = new int[2]();
+  game_info_.next = new int *[1];
+  game_info_.next[0] = new int[2]();
+  game_info_.next[0][0] = -1;
+  game_info_.next[0][1] = -1;
 
 
-  game_info_.high_score = GetHighScore();
+  game_info_.high_score = get_high_score_from_file(HIGH_SCORE_PATH_SNAKE);
   game_info_.level = LEVEL_MIN;
   game_info_.speed = SPEED_1_SNAKE;
   game_info_.pause = NOT_STARTED;

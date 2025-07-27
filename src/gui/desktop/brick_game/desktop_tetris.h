@@ -29,12 +29,12 @@ signals:
 protected:
     void paintEvent(QPaintEvent *event) override;
 
-    void DrawInfoBar(QPainter &painter, const Game_Info *game_info);
+    void DrawInfoBar(QPainter &painter, const GameInfo *game_info);
     void DrawFieldBorder(QPainter &painter);
-    void DrawPlayField(QPainter &painter, const Game_Info *game_info);
+    void DrawPlayField(QPainter &painter, const GameInfo *game_info);
 
     void DrawTetromino(QPainter &painter, const Tetromino *tet);
-    void DrawNextTetromino(QPainter &painter, const Game_Info *game_info, int infoX, int infoY);
+    void DrawNextTetromino(QPainter &painter, const GameInfo *game_info, int infoX, int infoY);
 
     void keyPressEvent(QKeyEvent *event) override;
     void UpdateGameTetris();
@@ -43,7 +43,7 @@ protected:
     void ResetGame();
 
 private:
-    Game_Info *game_tetris;
+    GameInfo *game_tetris;
     Tetromino *tetromino;
     QTimer *gametimer;
 };
