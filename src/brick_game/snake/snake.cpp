@@ -72,7 +72,7 @@ void Snake::GenerateApple() {
   game_info_.next[0][0] = position.x;
   game_info_.next[0][1] = position.y;
 
-  game_info_.field[position.x][position.y] = 3;  // 3 - яблоко
+  game_info_.field[position.y][position.x] = 3;  // 3 - яблоко
 }
 
 /**
@@ -96,10 +96,10 @@ void Snake::InitSnake() {
     int y = snake_coordinates_[i].y;
     if (i == 0) {
       // Голова змейки
-      game_info_.field[x][y] = 2;
+      game_info_.field[y][x] = 2;
     } else {
       // Тело змейки
-      game_info_.field[x][y] = 1;
+      game_info_.field[y][x] = 1;
     }
   }
 }
@@ -152,7 +152,7 @@ void Snake::MoveSnake(UserAction action) {
   } else {
     // Змейка не съела яблоко - удаляем хвост и очищаем его из поля
     SnakeElements tail = snake_coordinates_.back();
-    game_info_.field[tail.x][tail.y] = 0;
+    game_info_.field[tail.y][tail.x] = 0;
     snake_coordinates_.pop_back();
   }
 
@@ -162,10 +162,10 @@ void Snake::MoveSnake(UserAction action) {
     int y = snake_coordinates_[i].y;
     if (i == 0) {
       // Голова змейки
-      game_info_.field[x][y] = 2;
+      game_info_.field[y][x] = 2;
     } else {
       // Тело змейки
-      game_info_.field[x][y] = 1;
+      game_info_.field[y][x] = 1;
     }
   }
 
@@ -318,7 +318,7 @@ bool Snake::CheckSnakeBody(int x, int y) {
   }
   
   // Проверяем поле напрямую - если там есть змейка (1 или 2) или яблоко (3)
-  return (game_info_.field[x][y] == 1 || game_info_.field[x][y] == 2 || game_info_.field[x][y] == 3);
+  return (game_info_.field[y][x] == 1 || game_info_.field[y][x] == 2 || game_info_.field[y][x] == 3);
 }
 
 /**

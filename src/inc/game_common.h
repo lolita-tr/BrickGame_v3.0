@@ -50,6 +50,7 @@ void print_rectangle(WINDOW *win, int top_y, int bottom_y, int left_x, int right
 void print_field(WINDOW *win);
 void print_info_bar(WINDOW *win, GameInfo *game_info);
 void print_other_message(WINDOW *win, int pause_state);
+void print_play_field(WINDOW *win, GameInfo *game_info);
 
 // Common game utility functions
 int get_high_score_from_file(const char* filename);

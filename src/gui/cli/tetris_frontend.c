@@ -53,7 +53,7 @@ void game_loop() {
 
     user_input(tet, game_info, key);
 
-    refresh_game(gamewin, game_info->field, tet, game_info);
+    refresh_game(gamewin, /*game_info->field,*/ tet, game_info);
     if (game_info->pause == STARTED) {
       if ((currentTime - lastTime) > (CLOCKS_PER_SEC / 250)) {
         move_tetromino_down_one_row(tet, game_info);
@@ -161,19 +161,20 @@ void print_info_bar(WINDOW *win/*, GameInfo *game_info*/) {
  * @param[in] tet the current active tetromino to be drawn on the field.
  * @param[in] game_info the game info structure containing additional game data.
  */
-void print_play_field(WINDOW *win, int **play_field, Tetromino *tet,
+void draw_play_field(WINDOW *win, /*int **play_field,*/ Tetromino *tet,
                       GameInfo *game_info) {
-  for (int i = 0; i < FIELD_H; i++) {
-    for (int j = 0; j < FIELD_W; j++) {
-      if (play_field[i][j] == 1) {
-        wattron(win, COLOR_PAIR(3));
-        mvwaddch(win, i + 1, j + 1, '0');
-        wattroff(win, COLOR_PAIR(3));
-      } else {
-        mvwaddch(win, i + 1, j + 1, '.');
-      }
-    }
-  }
+  // for (int i = 0; i < FIELD_H; i++) {
+  //   for (int j = 0; j < FIELD_W; j++) {
+  //     if (/*play_field[i][j] == 1*/ game_info->field[i][j] == 1) {
+  //       wattron(win, COLOR_PAIR(3));
+  //       mvwaddch(win, i + 1, j + 1, '0');
+  //       wattroff(win, COLOR_PAIR(3));
+  //     } else {
+  //       mvwaddch(win, i + 1, j + 1, '.');
+  //     }
+  //   }
+  // }
+  print_play_field(win, game_info);
   draw_tetromino_on_field(win, tet);
   draw_next_tetromino_in_info(win, game_info);
   wrefresh(win);
@@ -244,10 +245,10 @@ void draw_next_tetromino_in_info(WINDOW *win, GameInfo *game_info) {
  * @param[in] game_info The game information structure containing additional
  * game data.
  */
-void refresh_game(WINDOW *win, int **play_field, Tetromino *tet,
+void refresh_game(WINDOW *win, /*int **play_field,*/ Tetromino *tet,
                   GameInfo *game_info) {
   print_field(win);
-  print_play_field(win, play_field, tet, game_info);
+  draw_play_field(win, /*play_field,*/ tet, game_info);
   print_info_bar(win, game_info);
   wrefresh(win);
 }

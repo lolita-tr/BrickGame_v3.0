@@ -15,10 +15,10 @@ class SnakeView {
   void HandelInput();
   void StartSnakeGame();
 
-  void RefreshGame(WINDOW *win, const GameInfo &game_info/*, Snake &snake*/);
+  void RefreshGame(WINDOW *win/*, const GameInfo &game_info, Snake &snake*/);
   void PrintField(WINDOW *win);
   void PrintInfoBar(WINDOW *win);
-  void DrawGameField(WINDOW *win, const GameInfo &game_info);
+  void DrawGameField(WINDOW *win/*, const GameInfo &game_info*/);
   void PrintOtherMessage(WINDOW *win);
 
   SnakeController &controller_;

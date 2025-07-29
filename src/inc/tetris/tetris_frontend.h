@@ -17,14 +17,14 @@ extern "C" {
 void init_ncurses();
 
 //void print_field(WINDOW *win);
-void print_play_field(WINDOW *win, int **play_field, Tetromino *tet,
+void draw_play_field(WINDOW *win, /*int **play_field,*/ Tetromino *tet,
                       GameInfo *game_info);
 void print_info_bar(WINDOW *win, GameInfo *game_info);
 
 void draw_next_tetromino_in_info(WINDOW *win, GameInfo *game_info);
 void draw_tetromino_on_field(WINDOW *win, Tetromino *tet);
 
-void refresh_game(WINDOW *win, int **play_field, Tetromino *tet,
+void refresh_game(WINDOW *win, /*int **play_field,*/ Tetromino *tet,
                   GameInfo *game_info);
 
 void print_start_sceen(WINDOW *win);

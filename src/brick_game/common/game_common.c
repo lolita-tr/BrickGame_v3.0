@@ -43,6 +43,39 @@ void print_field(WINDOW *win) {
 }
 
 /**
+ * @brief Prints the game field on the given window.
+ *
+ * @param[in] win the window to draw the game field on
+ * @param[in] game_info the game information structure
+ */
+void print_play_field(WINDOW *win, GameInfo *game_info){
+  for (int y = 0; y < FIELD_H; ++y) {
+    for (int x = 0; x < FIELD_W; ++x) {
+      switch (game_info->field[y][x]) {
+        case 0: 
+          wattron(win, COLOR_PAIR(1));
+          mvwaddch(win, y+1, x+1, '.');
+          wattroff(win, COLOR_PAIR(1));
+          break;
+        case 1: 
+          mvwaddch(win, y+1, x+1, 'o');
+          break;
+        case 2: 
+          mvwaddch(win, y+1, x+1, '0');
+          break;
+        case 3: 
+          wattron(win, COLOR_PAIR(3));
+          mvwaddch(win, y+1, x+1, '@');
+          wattroff(win, COLOR_PAIR(3));
+          break;
+        default: 
+          break;
+      }
+    }
+  }
+}
+
+/**
  * @brief Prints the information bar on the game window.
  *
  * @param[in] win the window to draw the information bar on

@@ -40,7 +40,7 @@ void SnakeView::StartSnakeGame() {
   while (controller_.snake_.GetPauseState() != QUIT) {
     werase(gamewin);
     HandelInput();
-    RefreshGame(gamewin, controller_.snake_.GetGameInfo()/*, controller_.snake_*/);
+    RefreshGame(gamewin/*, controller_.snake_.GetGameInfo(), controller_.snake_*/);
     if (controller_.snake_.GetPauseState() == STARTED) {
       controller_.UpdateCurrentState();
     }
@@ -149,10 +149,10 @@ void SnakeView::PrintInfoBar(WINDOW *win) {
  * @param[in] snake the current snake object, providing its position and state.
  */
 
-void SnakeView::RefreshGame(WINDOW *win, const GameInfo &game_info/*, Snake &snake*/) {
+void SnakeView::RefreshGame(WINDOW *win/*, const GameInfo &game_info, Snake &snake*/) {
   PrintField(win);
   PrintInfoBar(win);
-  DrawGameField(win, game_info);
+  DrawGameField(win/*, game_info*/);
   PrintOtherMessage(win);
   wrefresh(win);
 }
@@ -166,31 +166,33 @@ void SnakeView::RefreshGame(WINDOW *win, const GameInfo &game_info/*, Snake &sna
  * @param[in] win the window to draw the game field on.
  * @param[in] game_info the current game information containing the field state.
  */
-void SnakeView::DrawGameField(WINDOW *win, const GameInfo &game_info) {
-  for (int y = 0; y < FIELD_H; ++y) {
-    for (int x = 0; x < FIELD_W; ++x) {
-      switch (game_info.field[x][y]) {
-        case 0: 
-          wattron(win, COLOR_PAIR(1));
-          mvwaddch(win, y+1, x+1, '.');
-          wattroff(win, COLOR_PAIR(1));
-          break;
-        case 1: // Тело змейки
-          mvwaddch(win, y+1, x+1, 'o');
-          break;
-        case 2: // Голова змейки
-          mvwaddch(win, y+1, x+1, '0');
-          break;
-        case 3: // Яблоко
-          wattron(win, COLOR_PAIR(3));
-          mvwaddch(win, y+1, x+1, '@');
-          wattroff(win, COLOR_PAIR(3));
-          break;
-        default: 
-          break;
-      }
-    }
-  }
+void SnakeView::DrawGameField(WINDOW *win/*, const GameInfo &game_info*/) {
+  GameInfo game_info = controller_.snake_.GetGameInfo();
+  print_play_field(win, &game_info);
+  // for (int y = 0; y < FIELD_H; ++y) {
+  //   for (int x = 0; x < FIELD_W; ++x) {
+  //     switch (game_info.field[x][y]) {
+  //       case 0: 
+  //         wattron(win, COLOR_PAIR(1));
+  //         mvwaddch(win, y+1, x+1, '.');
+  //         wattroff(win, COLOR_PAIR(1));
+  //         break;
+  //       case 1: // Тело змейки
+  //         mvwaddch(win, y+1, x+1, 'o');
+  //         break;
+  //       case 2: // Голова змейки
+  //         mvwaddch(win, y+1, x+1, '0');
+  //         break;
+  //       case 3: // Яблоко
+  //         wattron(win, COLOR_PAIR(3));
+  //         mvwaddch(win, y+1, x+1, '@');
+  //         wattroff(win, COLOR_PAIR(3));
+  //         break;
+  //       default: 
+  //         break;
+  //     }
+  //   }
+  // }
 }
 
 
